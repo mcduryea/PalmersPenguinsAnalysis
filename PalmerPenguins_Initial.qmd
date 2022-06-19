@@ -1,0 +1,22 @@
+---
+title: "Palmer Penguins Initial Analysis"
+author: "Katie Duryea"
+format: html
+editor: visual
+execute:
+  keep-md: true
+---
+
+## Palmer Penguins
+
+This is a test of Quarto functionality using the Palmer Penguins package.
+
+```{r}
+ library(tidyverse)
+    library(palmerpenguins)
+    
+    penguins %>% head()
+
+```
+
+This code loads the `palmerpenguins` package and displays the top (or `head`) of the dataset.
