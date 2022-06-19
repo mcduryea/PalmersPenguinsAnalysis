@@ -93,6 +93,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link href="PalmerPenguins_Initial_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="PalmerPenguins_Initial_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet">
 
+<script src="PalmerPenguins_Initial_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="PalmerPenguins_Initial_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 
 </head>
 
@@ -172,6 +175,495 @@ x dplyr::lag()    masks stats::lag()</code></pre>
 </div>
 </div>
 <p>This code loads the <code>palmerpenguins</code> package and displays the top (or <code>head</code>) of the dataset.</p>
+</section>
+<section id="data-manipulation" class="level2">
+<h2 class="anchored" data-anchor-id="data-manipulation">Data Manipulation</h2>
+<p>In this section, we will use R code to manipulate data. In particular, we’ll learn how to filter rows, subset columns, group data, and compute summary statistics.</p>
+<p>Questions to answer:</p>
+<ul>
+<li><p>Does bill length vary by species?</p></li>
+<li><p>Does mass vary by year?</p></li>
+<li><p>Which penguin species are the largest?</p>
+<h3 id="frequency-tables" class="anchored">Frequency Tables</h3></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(island)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  island        n
+  &lt;fct&gt;     &lt;int&gt;
+1 Biscoe      168
+2 Dream       124
+3 Torgersen    52</code></pre>
+</div>
+</div>
+<p>The above code produces a frequency table of penguins by island.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  species       n
+  &lt;fct&gt;     &lt;int&gt;
+1 Adelie      152
+2 Chinstrap    68
+3 Gentoo      124</code></pre>
+</div>
+</div>
+<p>The above code produces a frequency table of penguins by species.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(island, species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 3
+  island    species       n
+  &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;
+1 Biscoe    Adelie       44
+2 Biscoe    Gentoo      124
+3 Dream     Adelie       56
+4 Dream     Chinstrap    68
+5 Torgersen Adelie       52</code></pre>
+</div>
+</div>
+<p>The above code produces a frequency table for penguin species by island.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(island, species) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+  island    Adelie Gentoo Chinstrap
+  &lt;fct&gt;      &lt;int&gt;  &lt;int&gt;     &lt;int&gt;
+1 Biscoe        44    124         0
+2 Dream         56      0        68
+3 Torgersen     52      0         0</code></pre>
+</div>
+</div>
+<p>The code above changes the format of the table so that it is more readable.</p>
+<p>To create an even better table, install and load the <code>kableExtra</code> package:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'kableExtra'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    group_rows</code></pre>
+</div>
+</div>
+<p>Create a frequency table for penguins species by island using the <code>kableExtra</code> package:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(island, species) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> species, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"hover"</span>, <span class="st">"striped"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-hover table-striped" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> island </th>
+   <th style="text-align:right;"> Adelie </th>
+   <th style="text-align:right;"> Gentoo </th>
+   <th style="text-align:right;"> Chinstrap </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Biscoe </td>
+   <td style="text-align:right;"> 44 </td>
+   <td style="text-align:right;"> 124 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Dream </td>
+   <td style="text-align:right;"> 56 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 68 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Torgersen </td>
+   <td style="text-align:right;"> 52 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p>Compute the average bill length for all penguins:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_bill_length_mm =</span> <span class="fu">mean</span>(bill_length_mm))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  mean_bill_length_mm
+                &lt;dbl&gt;
+1                  NA</code></pre>
+</div>
+</div>
+<p>Tell R to ignore “N/A” values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_bill_length_mm =</span> <span class="fu">mean</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  mean_bill_length_mm
+                &lt;dbl&gt;
+1                43.9</code></pre>
+</div>
+</div>
+<p>Include the median, standard deviation, minimum, 25th percentile, 75th percentile, and maximum bill lengths as well:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_bill_length =</span> <span class="fu">min</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_quartile_bill_length =</span> <span class="fu">quantile</span>(bill_length_mm, <span class="fl">0.25</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_bill_length =</span> <span class="fu">median</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_bill_length_mm =</span> <span class="fu">mean</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">third_quartile_bill_length =</span> <span class="fu">quantile</span>(bill_length_mm, <span class="fl">0.75</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">standard_deviation_bill_length =</span> <span class="fu">sd</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  name                           value
+  &lt;chr&gt;                          &lt;dbl&gt;
+1 min_bill_length                32.1 
+2 first_quartile_bill_length     39.2 
+3 median_bill_length             44.4 
+4 mean_bill_length_mm            43.9 
+5 third_quartile_bill_length     48.5 
+6 standard_deviation_bill_length  5.46</code></pre>
+</div>
+</div>
+<p>Use kable to format the table:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_bill_length =</span> <span class="fu">min</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_quartile_bill_length =</span> <span class="fu">quantile</span>(bill_length_mm, <span class="fl">0.25</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_bill_length =</span> <span class="fu">median</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_bill_length_mm =</span> <span class="fu">mean</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">third_quartile_bill_length =</span> <span class="fu">quantile</span>(bill_length_mm, <span class="fl">0.75</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">standard_deviation_bill_length =</span> <span class="fu">sd</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"hover"</span>, <span class="st">"striped"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-hover table-striped" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> name </th>
+   <th style="text-align:right;"> value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> min_bill_length </td>
+   <td style="text-align:right;"> 32.100000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> first_quartile_bill_length </td>
+   <td style="text-align:right;"> 39.225000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> median_bill_length </td>
+   <td style="text-align:right;"> 44.450000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> mean_bill_length_mm </td>
+   <td style="text-align:right;"> 43.921930 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> third_quartile_bill_length </td>
+   <td style="text-align:right;"> 48.500000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> standard_deviation_bill_length </td>
+   <td style="text-align:right;"> 5.459584 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<section id="selecting-specific-columns-and-rows" class="level3">
+<h3 class="anchored" data-anchor-id="selecting-specific-columns-and-rows">Selecting specific columns and rows</h3>
+<p>We can select specific columns (using the <code>select()</code> function) or rows satisfying certain conditions (using the <code>filter()</code> function). For example, we can select only the <code>species</code>, <code>island</code>, <code>sex</code>, and <code>year</code> columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, island, sex, year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 344 × 4
+   species island    sex     year
+   &lt;fct&gt;   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt;
+ 1 Adelie  Torgersen male    2007
+ 2 Adelie  Torgersen female  2007
+ 3 Adelie  Torgersen female  2007
+ 4 Adelie  Torgersen &lt;NA&gt;    2007
+ 5 Adelie  Torgersen female  2007
+ 6 Adelie  Torgersen male    2007
+ 7 Adelie  Torgersen female  2007
+ 8 Adelie  Torgersen male    2007
+ 9 Adelie  Torgersen &lt;NA&gt;    2007
+10 Adelie  Torgersen &lt;NA&gt;    2007
+# … with 334 more rows</code></pre>
+</div>
+</div>
+<p>We can use <code>filter()</code> to include only <code>Chinstrap</code> penguins.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, island, sex, year) <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">"Chinstrap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 68 × 4
+   species   island sex     year
+   &lt;fct&gt;     &lt;fct&gt;  &lt;fct&gt;  &lt;int&gt;
+ 1 Chinstrap Dream  female  2007
+ 2 Chinstrap Dream  male    2007
+ 3 Chinstrap Dream  male    2007
+ 4 Chinstrap Dream  female  2007
+ 5 Chinstrap Dream  male    2007
+ 6 Chinstrap Dream  female  2007
+ 7 Chinstrap Dream  female  2007
+ 8 Chinstrap Dream  male    2007
+ 9 Chinstrap Dream  female  2007
+10 Chinstrap Dream  male    2007
+# … with 58 more rows</code></pre>
+</div>
+</div>
+<p>We can *de*-select the species column using the <code>select()</code> function and a minus (<code>-</code>) sign in front of the column name. We can also store this smaller data frame into a new object called <code>chinstraps</code> by using the arror (<code>&lt;-</code>) operator.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>chinstraps <span class="ot">&lt;-</span> penguins <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(species, island, sex, year) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">"Chinstrap"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>species)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>chinstraps <span class="sc">%&gt;%</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  island sex     year
+  &lt;fct&gt;  &lt;fct&gt;  &lt;int&gt;
+1 Dream  female  2007
+2 Dream  male    2007
+3 Dream  male    2007
+4 Dream  female  2007
+5 Dream  male    2007
+6 Dream  female  2007</code></pre>
+</div>
+</div>
+</section>
+<section id="grouping-and-summarizing-groups" class="level3">
+<h3 class="anchored" data-anchor-id="grouping-and-summarizing-groups">Grouping and Summarizing Groups</h3>
+<p>We can use <code>group_by()</code> and <code>summarize()</code> to quickly compare summary statistics across groups. Let’s compare the average and standard deviation in <code>bill_depth_mm</code> across the species groups.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_bill_depth_mm =</span> <span class="fu">mean</span>(bill_depth_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_bill_depth_mm =</span> <span class="fu">sd</span>(bill_depth_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  species   mean_bill_depth_mm sd_bill_depth_mm
+  &lt;fct&gt;                  &lt;dbl&gt;            &lt;dbl&gt;
+1 Adelie                  18.3            1.22 
+2 Chinstrap               18.4            1.14 
+3 Gentoo                  15.0            0.981</code></pre>
+</div>
+</div>
+<p>The above code shows that Adelie and Chinstrap penguins have similar bill depths, but Gentoo penguins appear to have smaller bill depths.</p>
+</section>
+</section>
+<section id="data-visualization-with-ggplot" class="level2">
+<h2 class="anchored" data-anchor-id="data-visualization-with-ggplot">Data Visualization with <code>ggplot()</code></h2>
+<p>This is in introduction to data visualization with <code>ggplot()</code>.</p>
+</section>
+<section id="categorical-variables" class="level2">
+<h2 class="anchored" data-anchor-id="categorical-variables">Categorical variables</h2>
+<p>We can visualize categorical variables with a barplot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> species)) <span class="sc">+</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span><span class="st">"Counts of Penguin Species"</span>,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Species"</span>, <span class="at">y =</span> <span class="st">"Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Plot of penguins by island:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> island)) <span class="sc">+</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span><span class="st">"Counts of Penguins by Island"</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Island"</span>, <span class="at">y =</span> <span class="st">"Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<section id="numerical-variables" class="level3">
+<h3 class="anchored" data-anchor-id="numerical-variables">Numerical Variables</h3>
+<p>We can visualize a single numerical variable with a histogram (<code>geom_histogram()</code>), density (<code>geom_density()</code>), or boxplot (<code>geom_boxplot()</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm),</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span><span class="st">"Distribution of Bill Lengths"</span>,</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill Length (mm)"</span>, <span class="at">y =</span> <span class="st">"Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing non-finite values (stat_bin).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The above code produces a histogram of bill length. It appears to be a bi-modal distribution.</p>
+<p>Visualize bill length as a boxplot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm),</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span><span class="st">"Distribution of Bill Lengths"</span>,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill Length (mm)"</span>, <span class="at">y =</span> <span class="st">"Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing non-finite values (stat_boxplot).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="two-numerical-variables" class="level3">
+<h3 class="anchored" data-anchor-id="two-numerical-variables">Two Numerical Variables</h3>
+<p>We can explore a potential relationship between two numerical variables with a scatterplot.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> bill_depth_mm, <span class="at">y =</span> bill_length_mm)) <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Bill Depth and Length"</span>,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill Depth (mm)"</span>,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill Length (mm)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Bill length may be correlated with depth, but it is not a clear correlation.</p>
+<p>See if body mass is correlated with bill length:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> body_mass_g, <span class="at">y =</span> bill_length_mm)) <span class="sc">+</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Body Mass and Length"</span>,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Body mass (g)"</span>,</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill Length (mm)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Body mass and bill length appear to have a much stronger correlation!</p>
+</section>
+<section id="two-categorical-variables" class="level3">
+<h3 class="anchored" data-anchor-id="two-categorical-variables">Two Categorical Variables</h3>
+<p>We can explore potential associations between pairs of categorical variables using barplots and fill.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> island, <span class="at">fill =</span> species)) <span class="sc">+</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Species by Island"</span>,</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Island"</span>,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Species"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The above plot shows that the species of penguins varies by island, but Adelie penguins are found on all three islands.</p>
+</section>
+<section id="one-numerical-and-one-categorical-variable" class="level3">
+<h3 class="anchored" data-anchor-id="one-numerical-and-one-categorical-variable">One Numerical and One Categorical Variable</h3>
+<p>We can also ompare a numerical variable and a categorical variable using side-by-side boxplots, or faceted plots.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> bill_depth_mm, <span class="at">y =</span> species)) <span class="sc">+</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Bill Depth by Species"</span>,</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill Depth (mm)"</span>,</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing non-finite values (stat_boxplot).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> bill_depth_mm)) <span class="sc">+</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>species, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Bill Depth by Species"</span>,</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill Depth (mm)"</span>,</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing non-finite values (stat_bin).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-46-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The above plot shows that Adelie and Chinstrap penguins have similar distributions of bill depth, but Gentoo penguois have smaller bill depths. It gives more insight on the differences between penguins rather than just comparing means.</p>
+</section>
+</section>
+<section id="advanced-plotting" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-plotting">Advanced plotting</h2>
+<p>In this section, we will explore creating more complex plots. See the example below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">%&gt;%</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(sex)) <span class="sc">%&gt;%</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, </span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">y =</span> flipper_length_mm,</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">color =</span> species,</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>                           <span class="at">shape =</span> sex)) <span class="sc">+</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm,</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">y =</span> flipper_length_mm,</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">color =</span> species)) <span class="sc">+</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(island), <span class="at">cols =</span> <span class="fu">vars</span>(sex), <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Flipper and Bill Lengths by Species and Sex"</span>,</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill Length (mm)"</span>,</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Flipper Length(mm)"</span>) <span class="sc">+</span></span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using method = 'loess' and formula 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="PalmerPenguins_Initial_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 
 </main>
